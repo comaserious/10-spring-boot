@@ -1,0 +1,7 @@
+#이녀석도 properties 파일과 마찬가지로 yaml 파일의 이름을 application 이라고 지정해 사용해야한다
+
+test:
+  greeting: hi~~~~~~~~~
+  array: 안녕, 3000만큼, 어쩌구저쩌구
+  value: i am yaml
+username: 홍길이
