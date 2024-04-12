@@ -5,3 +5,5 @@ test:
   array: 안녕, 3000만큼, 어쩌구저쩌구
   value: i am yaml
 username: 홍길이
+
+#값을 넣을때는 한번 띄어써야 값이 들어간다 이점은 명심하자
