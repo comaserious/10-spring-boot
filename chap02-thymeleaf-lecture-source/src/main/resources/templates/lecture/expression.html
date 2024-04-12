@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Expression</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/common.css}">
+</head>
+<body>
+    <h1 style="text-align: center; color: chocolate">Expression(표현식)</h1>
+    <h2>표현식1 - 변수 표현식 ${...}</h2>
+
+
+<!--
+  parameter 로 넘어온 경우는 param, session attribute 일 경우에는 session,
+  model 에 담겨 온 경우는 따로 적지 않는다(model 의 경우 spring-web에 다룰 예정)
+  -->
+<!--쿼리 스트링 즉 주소값 ? 뒤에 들어간 값을 읽을 때는 param. 을 사용한다-->
+    <p style="color: blue" th:text="${ param.title }"></p>
+                        <!--th: 타임리프를 사용하겠다-->
+
+<!--
+    제공되는 표현식의 종류
+       변수 표현식 : ${...}
+       선택 표현식 : *{...}
+       메시지 표현식 : #{...}
+       링크 표현식 : @{...}
+       조각 표현식 : ~{...}
+       인라인 표현식 : [[...]], [(...)]]
+-->
+
+    <p th:text="${ param.no[0] }"></p>
+    <p th:text="${ param.no[1] }"></p>
+<!--    <p th:text="${ param.no[2] }"></p>-->
+<!--파라미터가 존재하지 않으면 무시하지 않고 에러가 발생한다 status=500-->
+
+    <h2>표현식 2 - 메시지 표현식 #{...}</h2>
+    <p th:text="#{message.value}" ></p>
+
+    <h2>표현식 3 - 링크 표현식 @{...}</h2>
+    <a th:href="@{/}">메인으로</a>
+
+    <h2>표현식 4 - 선택 변수 표현식 *{...}</h2>
+    <p th:text="${member.name}"></p>
+    <p th:Object="${member}" th:text="*{age}"></p>
+    <p th:Object="${member}" th:text="*{gender}"></p>
+
+<!--    부모태그에 Object 를 먹이고 자식태그에 선택표현식을 사용하여 좀더 중복된 코드를 생략할수있다-->
+    <div th:Object="${member}">
+        <p th:text="*{address}"></p>
+        <p th:text="*{gender}"></p>
+    </div>
+
+    <h2>HTML 출력 th:text, th:utext, th:value</h2>
+    <h3>
+        th:text, th:utext 등 내부에 값을 지정하기 위해 사용할 수 있다
+        th:text 태그는 escape 가 적용되어 있어 태그를 단순 문자열로 취급을 하지만,
+        th:utext 태그는 escapre 가 적용되어 있지 않아 태그를 태그로서 인식을 할 수 있다
+        (DB 에 태그가 포함된 문자열을 저장할때 유용하다)
+    </h3>
+    <ul>
+        <li th:text="${hello}"></li>
+        <li th:utext = "${hello}"></li>
+        <li><input type="text" th:value="타임리프"></li>
+    </ul>
+
+    <h2>표현식 5 - 인라인 표현식 [[...]],[(...)]</h2>
+    <pre th:inline="none">
+        변수 표현식의 값을 html에 직접 표시하기 위해서는 th:text 와 같은 [[...]] 를 사용하고
+        th:utext 와 같은 [(...)] 를 사용할수있다.
+        대괄호롤 묶어서 이와 같이 변수 표현식의 값을 가져오는 것을 인라인모드라고 하며
+        인라인 모드는 text 모드와 자바스크립트 모드가 있다
+
+        우리는 변수 표현식의 값을 자바스크립트에서 쓰는 것이 아닌 html 에서 사용하려는
+        것이므로 th:inline="text" 를 태그에 속성값으로 주고 써야하지만,
+        th:inline"text"를 쓰지 않아도 적용이 된다
+
+        반면 인라인 모드를 적용하지 않으려면 th:inline="none"을 속성값으로 주면
+        변수 표현식의 값이 인라인모드로 사용하지 않아 ([[]],[()] 를 인식하지 않음)
+        단순한 문자열로 처리 할수 있다
+    </pre>
+
+    <ul>
+        <li th:inline="text">[[${hello}]]</li>
+        <li>[(${hello})]</li>
+        <li th:inline="none">[[${hello}]]</li>
+        <li th:inline="none">[(${hello})]</li>
+    </ul>
+
+    <script th:inline="javascript">
+        window.onload=function (){
+            /* 정적인 페이지 에서는 자바스크립트 문법의 오류가 발생한다. (리터럴 형태가 아니기 때문)
+            * 동적인 페이지(application 실행시) ""를 자동적으로 붙여주어 문자열로 취급을 해준다*/
+            // let hello = [[${hello}]];
+
+            /* 정적 페이지에서는 자바스크립트 문법 오류가 발생하지 않는다. (문자열 리터럴 이기 때문에)
+            *  하지만 동적페이지 에서는 에러가 발생한다 " " 로 감싸기 때문에
+            *  ""[[${hello}]]""*/
+            // let hello="[[${hello}]]";
+
+            let hello = '[(${hello})]';
+            // <h3></h3> 은 html 문법이기 때문에 script 에서는 적용이 되지 않는다
+            // 따라서 <h3> 이 그대로 출력 되지만 어쨌든 controller 값을 전부 가지고 오는것은 맞다
+            alert(hello);
+        }
+    </script>
+
+    <h2>리터럴 치환 ||</h2>
+    <h3>'+' 를 사용하지 않고 문자열 합치기</h3>
+    <p th:Object="${member}" th:text="|name = '*{name}'|"></p>
+    <p th:Object="${member}" th:text="|age = '*{age}'|"></p>
+    <p th:Object="${member}" th:text="|address = '*{address}'|"></p>
+    <p th:Object="${member}" th:text="|gender = '*{gender}'|"></p>
+
+    <h2>th:block</h2>
+    <h3>
+        범위를 지정하고 싶을때 사용한다
+        th:block 을 통해 해당 범위에 변수나 객체를 적용하거나
+        조건에 해당되는 지에 따라 해당 범위를 보여주거나 보여주지 않을때
+        사용할 수 있다
+        div 처럼 공간을 차지 하는것이 아니기때문에 웹상 디자인에 영향을 주지 않는다
+    </h3>
+
+    <th:block th:Object="${member}">
+       <p th:text="*{name}"></p>
+    </th:block>
+</body>
+</html>
